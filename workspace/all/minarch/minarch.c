@@ -3042,12 +3042,16 @@ static struct {
 	int slot;
 	int save_exists;
 	int preview_exists;
+	int hide_save_load;
+	int visible_count;
 } menu = {
 	.bitmap = NULL,
 	.disc = -1,
 	.total_discs = 0,
 	.save_exists = 0,
 	.preview_exists = 0,
+	.hide_save_load = 0,
+	.visible_count = MENU_ITEM_COUNT,
 	
 	.items = {
 		[ITEM_CONT] = "Continue",
@@ -3058,15 +3062,70 @@ static struct {
 	}
 };
 
+static int Menu_nextVisible(int current) {
+	int next = current + 1;
+	while (next < MENU_ITEM_COUNT && menu.items[next][0] == '\0') {
+		next++;
+	}
+	if (next >= MENU_ITEM_COUNT) {
+		next = 0;
+		while (next < MENU_ITEM_COUNT && menu.items[next][0] == '\0') {
+			next++;
+		}
+	}
+	return next;
+}
+
+static int Menu_prevVisible(int current) {
+	int prev = current - 1;
+	while (prev >= 0 && menu.items[prev][0] == '\0') {
+		prev--;
+	}
+	if (prev < 0) {
+		prev = MENU_ITEM_COUNT - 1;
+		while (prev >= 0 && menu.items[prev][0] == '\0') {
+			prev--;
+		}
+	}
+	return prev;
+}
+
 void Menu_init(void) {
 	menu.overlay = SDL_CreateRGBSurface(SDL_SWSURFACE,DEVICE_WIDTH,DEVICE_HEIGHT,FIXED_DEPTH,RGBA_MASK_AUTO);
 	SDLX_SetAlpha(menu.overlay, SDL_SRCALPHA, 0x80);
 	SDL_FillRect(menu.overlay, NULL, 0);
 	
+	menu.hide_save_load = 0;
+	menu.visible_count = MENU_ITEM_COUNT;
+	
 	char emu_name[256];
 	getEmuName(game.path, emu_name);
 	sprintf(menu.minui_dir, SHARED_USERDATA_PATH "/.minui/%s", emu_name);
 	mkdir(menu.minui_dir, 0755);
+	
+	char* no_save_state_content = allocFile(NO_SAVE_STATE_SYSTEMS_PATH);
+	if (no_save_state_content) {
+		char* line = no_save_state_content;
+		while (*line) {
+			while (*line == '\n' || *line == '\r') line++;
+			if (!*line) break;
+			
+			char* end = line;
+			while (*end && *end != '\n' && *end != '\r') end++;
+			*end = '\0';
+			
+			if (strcmp(emu_name, line) == 0) {
+				menu.hide_save_load = 1;
+				menu.items[ITEM_SAVE] = "";
+				menu.items[ITEM_LOAD] = "";
+				menu.visible_count = MENU_ITEM_COUNT - 2;
+				break;
+			}
+			
+			line = end + 1;
+		}
+		free(no_save_state_content);
+	}
 
 	sprintf(menu.slot_path, "%s/%s.txt", menu.minui_dir, game.name);
 	
@@ -4287,13 +4346,11 @@ static void Menu_loop(void) {
 		PAD_poll();
 		
 		if (PAD_justPressed(BTN_UP)) {
-			selected -= 1;
-			if (selected<0) selected += MENU_ITEM_COUNT;
+			selected = Menu_prevVisible(selected);
 			dirty = 1;
 		}
 		else if (PAD_justPressed(BTN_DOWN)) {
-			selected += 1;
-			if (selected>=MENU_ITEM_COUNT) selected -= MENU_ITEM_COUNT;
+			selected = Menu_nextVisible(selected);
 			dirty = 1;
 		}
 		else if (PAD_justPressed(BTN_LEFT)) {
@@ -4430,9 +4487,12 @@ static void Menu_loop(void) {
 			GFX_blitButtonGroup((char*[]){ "B","BACK", "A","OKAY", NULL }, 1, screen, 1);
 			
 			// list
-			oy = (((DEVICE_HEIGHT / FIXED_SCALE) - PADDING * 2) - (MENU_ITEM_COUNT * PILL_SIZE)) / 2;
+			oy = (((DEVICE_HEIGHT / FIXED_SCALE) - PADDING * 2) - (menu.visible_count * PILL_SIZE)) / 2;
+			int vi = 0;
 			for (int i=0; i<MENU_ITEM_COUNT; i++) {
 				char* item = menu.items[i];
+				if (item[0] == '\0') continue;
+				
 				SDL_Color text_color = COLOR_WHITE;
 				
 				if (i==selected) {
@@ -4458,7 +4518,7 @@ static void Menu_loop(void) {
 					// pill
 					GFX_blitPill(ASSET_WHITE_PILL, screen, &(SDL_Rect){
 						SCALE1(PADDING),
-						SCALE1(oy + PADDING + (i * PILL_SIZE)),
+						SCALE1(oy + PADDING + (vi * PILL_SIZE)),
 						ow,
 						SCALE1(PILL_SIZE)
 					});
@@ -4469,7 +4529,7 @@ static void Menu_loop(void) {
 					text = TTF_RenderUTF8_Blended(font.large, item, COLOR_BLACK);
 					SDL_BlitSurface(text, NULL, screen, &(SDL_Rect){
 						SCALE1(2 + PADDING + BUTTON_PADDING),
-						SCALE1(1 + PADDING + oy + (i * PILL_SIZE) + 4)
+						SCALE1(1 + PADDING + oy + (vi * PILL_SIZE) + 4)
 					});
 					SDL_FreeSurface(text);
 				}
@@ -4478,9 +4538,10 @@ static void Menu_loop(void) {
 				text = TTF_RenderUTF8_Blended(font.large, item, text_color);
 				SDL_BlitSurface(text, NULL, screen, &(SDL_Rect){
 					SCALE1(PADDING + BUTTON_PADDING),
-					SCALE1(oy + PADDING + (i * PILL_SIZE) + 4)
+					SCALE1(oy + PADDING + (vi * PILL_SIZE) + 4)
 				});
 				SDL_FreeSurface(text);
+				vi++;
 			}
 			
 			// slot preview

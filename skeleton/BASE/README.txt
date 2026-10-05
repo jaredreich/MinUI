@@ -214,6 +214,11 @@ Simple mode
 Not simple enough for you (or maybe your kids)? MinUI has a simple mode that hides the Tools folder and replaces Options in the in-game menu with Reset. Perfect for handing off to littles (and olds too I guess). Just create an empty file named "enable-simple-mode" (no extension) in "/.userdata/shared/".
 
 ----------------------------------------
+No save state systems
+
+To hide Save and Load from the in-game menu for specific systems, create a file named "no-save-state-systems" (no extension) in "/.userdata/shared/" and add one system tag per line (eg. "PS", "SFC"). Auto-save (eg. on lid close) still works independently.
+
+----------------------------------------
 Advanced
 
 MinUI can automatically run a user-authored shell script on boot. Just place a file named "auto.sh" in "/.userdata/<DEVICE>/". If you're on Windows, make sure your text editor uses Unix line-endings (eg. `\n`), these devices usually choke on Windows line-endings (eg. `\r\n`).
