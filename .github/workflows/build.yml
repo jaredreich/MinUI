@@ -6,8 +6,7 @@ on:
       platforms:
         description: 'Platforms to build (comma-separated, or "all")'
         required: false
-        # default: 'all'
-        default: 'rg35xxplus'
+        default: 'all'
         type: string
 
 jobs:
@@ -52,7 +51,7 @@ jobs:
         if: steps.should_build.outputs.build == 'true'
         run: |
           cd ${{ github.workspace }}
-          make -f makefile.toolchain PLATFORM=${{ matrix.platform }}
+          make ${{ matrix.platform }}
 
       - name: Package release files
         if: steps.should_build.outputs.build == 'true'
