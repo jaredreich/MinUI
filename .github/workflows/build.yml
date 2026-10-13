@@ -21,7 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [rg35xx, rg35xxplus]
+        # platform: [miyoomini, trimuismart, rg35xx, rg35xxplus, my355, tg5040, zero28, rgb30, m17, gkdpixel, my282, magicmini]
+        platform: [rg35xxplus]
     
     steps:
       - name: Checkout repository
