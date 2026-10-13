@@ -1,0 +1,95 @@
+name: Build MinUI
+
+on:
+  workflow_dispatch:
+    inputs:
+      platforms:
+        description: 'Platforms to build (comma-separated, or "all")'
+        required: false
+        default: 'all'
+        type: string
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 720
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [rg35xx, rg35xxplus]
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Check if should build this platform
+        id: should_build
+        run: |
+          PLATFORMS_INPUT="${{ github.event.inputs.platforms || 'all' }}"
+          if [ "$PLATFORMS_INPUT" = "all" ]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+          else
+            IFS=',' read -ra PLATFORM_LIST <<< "$PLATFORMS_INPUT"
+            BUILD_THIS=false
+            for p in "${PLATFORM_LIST[@]}"; do
+              p_trimmed=$(echo "$p" | xargs)
+              if [ "$p_trimmed" = "${{ matrix.platform }}" ]; then
+                BUILD_THIS=true
+                break
+              fi
+            done
+            echo "build=$BUILD_THIS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build platform
+        if: steps.should_build.outputs.build == 'true'
+        run: |
+          cd ${{ github.workspace }}
+          make -f makefile.toolchain PLATFORM=${{ matrix.platform }}
+
+      - name: Upload build artifacts
+        if: steps.should_build.outputs.build == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.platform }}-build
+          path: workspace/${{ matrix.platform }}/build/
+          if-no-files-found: warn
+          retention-days: 7
+
+  package:
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+
+      - name: Create full build
+        run: |
+          cd ${{ github.workspace }}
+          # This will package everything if builds exist
+          # The main make package step might work if partial builds exist
+          make package 2>&1 | tail -40
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: MinUI-release-package
+          path: releases/
+          if-no-files-found: warn
+          retention-days: 30
