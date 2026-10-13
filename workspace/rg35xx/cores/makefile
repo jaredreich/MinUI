@@ -19,6 +19,7 @@ fake-08_CORE = fake08_libretro.so
 fake-08_BUILD_PATH = fake-08/platform/libretro
 
 fceumm_REPO = https://github.com/libretro/libretro-fceumm
+fceumm_HASH = d0c3023e142abacfec8bbc28f07b982596951f27
 
 gambatte_REPO = https://github.com/libretro/gambatte-libretro
 
