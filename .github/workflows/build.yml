@@ -8,11 +8,11 @@ on:
         required: false
         default: 'all'
         type: string
-  push:
-    branches: [ main ]
-    paths-ignore:
-      - '**.md'
-      - 'LICENSE'
+  # push:
+  #   branches: [ main ]
+  #   paths-ignore:
+  #     - '**.md'
+  #     - 'LICENSE'
 
 jobs:
   build:
