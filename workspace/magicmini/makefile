@@ -25,5 +25,6 @@ clean:
 	
 $(REQUIRES_351FILES):
 	git clone --depth 1 https://github.com/shauninman/351Files.git $(REQUIRES_351FILES)
+	cd $(REQUIRES_351FILES) && git checkout e6c44d3fafdbefe6f5f9c6d118d6d033ad6e89f3
 	
 include ../all/readmes/makefile

@@ -28,5 +28,6 @@ clean:
 	
 $(REQUIRES_COMMANDER):
 	git clone --depth 1 --branch minui-rg35xx https://github.com/shauninman/DinguxCommander.git $(REQUIRES_COMMANDER)
+	cd $(REQUIRES_COMMANDER) && git checkout 2b8b29042c172dbca78eadbbb989e51a0b9b635d
 
 include ../all/readmes/makefile

@@ -69,14 +69,18 @@ clean:
 	
 $(REQUIRES_UNZIP60):
 	git clone --depth 1 https://github.com/shauninman/unzip60.git $(REQUIRES_UNZIP60)
+	cd $(REQUIRES_UNZIP60) && git checkout f6389e3aafc0fc0d31209f7f2a33c4392f92342a
 
 $(REQUIRES_SDL2):
 	git clone https://github.com/JohnnyonFlame/SDL-malifbdev-rot $(REQUIRES_SDL2)
+	cd $(REQUIRES_SDL2) && git checkout d4a7d7503524cc469fe775242f3f925d4dd56c88
 
 $(REQUIRES_DTC):
 	git clone https://github.com/dgibson/dtc $(REQUIRES_DTC)
+	cd $(REQUIRES_DTC) && git checkout 7f3184a6c550bb8fb59e93c9901d75dced889dcf
 
 $(REQUIRES_FBSET):
 	git clone https://github.com/shauninman/union-fbset $(REQUIRES_FBSET)
+	cd $(REQUIRES_FBSET) && git checkout f262058ae46e628207f29c4813324ad4dc992fbd
 
 include ../all/readmes/makefile

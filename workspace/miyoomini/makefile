@@ -39,7 +39,9 @@ clean:
 
 $(REQUIRES_SDL):
 	git clone --depth 1 --branch miniui-miyoomini https://github.com/shauninman/SDL-1.2.git $(REQUIRES_SDL)
+	cd $(REQUIRES_SDL) && git checkout 0e0919585f2f809471ba45bdc16624ef4e887bc0
 $(REQUIRES_COMMANDER):
 	git clone --depth 1 --branch miniui-miyoomini https://github.com/shauninman/DinguxCommander.git $(REQUIRES_COMMANDER)
+	cd $(REQUIRES_COMMANDER) && git checkout 5e60060257fc5b2acf5b4b7a6e993d31bf0f35ed
 
 include ../all/readmes/makefile

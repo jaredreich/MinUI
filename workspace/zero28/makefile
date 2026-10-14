@@ -29,5 +29,6 @@ clean:
 	
 $(REQUIRES_COMMANDER):
 	git clone --depth 1 https://github.com/shauninman/DinguxCommander-sdl2.git $(REQUIRES_COMMANDER)
+	cd $(REQUIRES_COMMANDER) && git checkout 8eaa0efa132a6eae909df5aa1b31950044f568cc
 
 include ../all/readmes/makefile

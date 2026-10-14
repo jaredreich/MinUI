@@ -36,12 +36,16 @@ clean:
 
 $(REQUIRES_COMMANDER):
 	git clone --depth 1 https://github.com/shauninman/DinguxCommander-sdl2.git $(REQUIRES_COMMANDER)
+	cd $(REQUIRES_COMMANDER) && git checkout 8eaa0efa132a6eae909df5aa1b31950044f568cc
 $(REQUIRES_EVTEST):
 	git clone --depth 1 https://github.com/freedesktop-unofficial-mirror/evtest.git $(REQUIRES_EVTEST)
+	cd $(REQUIRES_EVTEST) && git checkout b8343ec1124da18bdabcc04809a8731b9e39295d
 $(REQUIRES_MKBOOTIMG):
 	git clone --depth 1 https://github.com/osm0sis/mkbootimg $(REQUIRES_MKBOOTIMG)
+	cd $(REQUIRES_MKBOOTIMG) && git checkout 17cea80bd5af64e45cdf9e263cad7555030e0e86
 $(REQUIRES_RSCEGO):
-	git clone --depth 1 https://github.com/Evsio0n/rsce-go $(REQUIRES_RSCEGO)
+	git clone https://github.com/Evsio0n/rsce-go $(REQUIRES_RSCEGO)
+	cd $(REQUIRES_RSCEGO) && git checkout 7aa3ebb91eb79b591e1442e6fd287efd24cc6cb1
 	cd $(REQUIRES_RSCEGO) && go mod tidy && go mod download
 
 include ../all/readmes/makefile

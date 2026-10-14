@@ -37,9 +37,17 @@ shell:
 name: 
 	@echo $(RELEASE_NAME)
 
+ifeq ($(PLATFORM),rg35xx)
+TOOLCHAIN_HASH=556587112675cf54f5bae828054efcd7d4ac6a70
+else ifeq ($(PLATFORM),miyoomini)
+TOOLCHAIN_HASH=cfcae3083679de59d6600d4ba05676c654b6d24e
+else ifeq ($(PLATFORM),rg35xxplus)
+TOOLCHAIN_HASH=abb9cdc65f81a608839d0f060e6d7d38df3242f0
+endif
+
 build:
 	# ----------------------------------------------------
-	make build -f makefile.toolchain PLATFORM=$(PLATFORM)
+	make build -f makefile.toolchain PLATFORM=$(PLATFORM) TOOLCHAIN_HASH=$(TOOLCHAIN_HASH)
 	# ----------------------------------------------------
 
 system:

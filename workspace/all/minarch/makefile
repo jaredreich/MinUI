@@ -48,6 +48,7 @@ clean:
 
 libretro-common:
 	git clone https://github.com/libretro/libretro-common
+	cd libretro-common && git checkout 7c56a43b424716b6b0fd36239d6329e9e2e1afe6
 	
 $(PREFIX)/include/msettings.h:
 	cd /root/workspace/$(PLATFORM)/libmsettings && make
