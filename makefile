@@ -99,7 +99,7 @@ clean:
 setup: name
 	# ----------------------------------------------------
 	# make sure we're running in an input device
-	tty -s 
+	tty -s || test "$$CI" = "true"
 	
 	# ready fresh build
 	rm -rf ./build
@@ -109,6 +109,7 @@ setup: name
 	# remove authoring detritus
 	cd ./build && find . -type f -name '.keep' -delete
 	cd ./build && find . -type f -name '*.meta' -delete
+	mkdir -p ./workspace
 	echo $(BUILD_HASH) > ./workspace/hash.txt
 	
 	# copy readmes to workspace so we can use Linux fmt instead of host's
